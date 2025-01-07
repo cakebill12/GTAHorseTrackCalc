@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTA Online Horse Track Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #2c2c2c;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #00ff00;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+        .odds-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .odds-inputs div {
+            text-align: center;
+        }
+        .odds-inputs input {
+            width: 40px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        input[type="number"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background: #00ff00;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+        }
+        .output div {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GTA Horse Track Calculator</h1>
+
+        <label for="odds">Enter Odds (one digit per box):</label>
+        <div class="odds-inputs">
+            <div>
+                <label>Horse 1</label>
+                <input type="number" id="odds1" placeholder="1">
+            </div>
+            <div>
+                <label>Horse 2</label>
+                <input type="number" id="odds2" placeholder="2">
+            </div>
+            <div>
+                <label>Horse 3</label>
+                <input type="number" id="odds3" placeholder="3">
+            </div>
+            <div>
+                <label>Horse 4</label>
+                <input type="number" id="odds4" placeholder="4">
+            </div>
+            <div>
+                <label>Horse 5</label>
+                <input type="number" id="odds5" placeholder="5">
+            </div>
+            <div>
+                <label>Horse 6</label>
+                <input type="number" id="odds6" placeholder="6">
+            </div>
+        </div>
+
+        <label for="betAmount">Bet Amount</label>
+        <input type="number" id="betAmount" placeholder="Enter bet amount (e.g., 9000)">
+
+        <button onclick="calculateResults()">Calculate</button>
+
+        <div class="output" id="results">
+            <div>Win Chances (%): <span id="winChances">0</span></div>
+            <div>Total Win Payout: <span id="winPayout">0</span></div>
+            <div>Total Win Profit: <span id="winProfit">0</span></div>
+            <div>Best Horse to Bet On: <span id="bestHorse">N/A</span></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateResults() {
+            // Get user inputs
+            const oddsArray = [
+                parseFloat(document.getElementById('odds1').value) || 0,
+                parseFloat(document.getElementById('odds2').value) || 0,
+                parseFloat(document.getElementById('odds3').value) || 0,
+                parseFloat(document.getElementById('odds4').value) || 0,
+                parseFloat(document.getElementById('odds5').value) || 0,
+                parseFloat(document.getElementById('odds6').value) || 0
+            ];
+            const betAmount = parseFloat(document.getElementById('betAmount').value) || 0;
+
+            // Initialize accumulators
+            let totalWinPayout = 0;
+            let totalWinProfit = 0;
+            let winChances = [];
+            let winCounts = [];
+
+            // Loop through each odds value
+            oddsArray.forEach(odds => {
+                if (odds > 0) {
+                    const winChance = (1 / (odds + 1)) * 100; // Convert odds to percentage chance
+                    const winPayout = (odds + 1) * betAmount;
+                    const winProfit = winPayout - betAmount;
+
+                    winChances.push(winChance.toFixed(2));
+                    totalWinPayout += winPayout;
+                    totalWinProfit += winProfit;
+
+                    // Simulate 100 test runs
+                    let winCount = 0;
+                    for (let i = 0; i < 100000; i++) {
+                        const random = Math.random() * 100000;
+                        if (random < winChance) {
+                            winCount++;
+                        }
+                    }
+                    winCounts.push(winCount);
+                } else {
+                    winCounts.push(0); // Skip invalid odds
+                }
+            });
+
+            // Determine the best odds to bet on
+            const maxWinCount = Math.max(...winCounts);
+            const bestOddsIndex = winCounts.indexOf(maxWinCount);
+            const bestHorse = bestOddsIndex >= 0 ? `Horse ${bestOddsIndex + 1}` : "N/A";
+
+            // Display results
+            document.getElementById('winChances').innerText = winChances.join(', ');
+            document.getElementById('winPayout').innerText = totalWinPayout.toFixed(2);
+            document.getElementById('winProfit').innerText = totalWinProfit.toFixed(2);
+            document.getElementById('bestHorse').innerText = bestHorse;
+        }
+    </script>
+</body>
+</html>
